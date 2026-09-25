@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Quiz</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="instructor-dashboard.html">Dashboard</a>
+            <a href="create-course.html">Create Course</a>
+            <a href="materials.html">Materials</a>
+            <a href="instructor-assignments.html">Assignments</a>
+            <a href="instructor-quiz.html">Quiz</a>
+            <a href="students.html">Students</a>
+            <a href="login.html">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Create Quiz Question</h1>
+
+        <p class="dashboard-text">
+            Add a multiple-choice question for your course.
+        </p>
+
+
+        <div class="form-card">
+
+            <form id="quizForm">
+
+                <label>Course ID</label>
+
+                <input type="number" id="course_id" placeholder="Enter course ID" required>
+
+
+                <label>Question</label>
+
+                <textarea id="question" rows="4" placeholder="Enter your question" required></textarea>
+
+
+                <label>Option A</label>
+
+                <input type="text" id="option_a" placeholder="Enter option A" required>
+
+
+                <label>Option B</label>
+
+                <input type="text" id="option_b" placeholder="Enter option B" required>
+
+
+                <label>Option C</label>
+
+                <input type="text" id="option_c" placeholder="Enter option C" required>
+
+
+                <label>Option D</label>
+
+                <input type="text" id="option_d" placeholder="Enter option D" required>
+
+
+                <label>Correct Answer</label>
+
+                <select id="correct_answer" required>
+
+                    <option value="">Select Correct Answer</option>
+
+                    <option value="A">A</option>
+
+                    <option value="B">B</option>
+
+                    <option value="C">C</option>
+
+                    <option value="D">D</option>
+
+                </select>
+
+
+                <button type="submit">
+                    Add Quiz Question
+                </button>
+
+            </form>
+
+
+            <p id="quiz-message"></p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check instructor
+        if (user.role !== "INSTRUCTOR") {
+
+            alert("Only instructors can add quiz questions.");
+
+            window.location.href = "student-dashboard.html";
+
+        }
+
+
+        // Submit quiz question
+        document.getElementById("quizForm")
+            .addEventListener("submit", function (event) {
+
+                event.preventDefault();
+
+
+                const courseId =
+                    document.getElementById("course_id").value;
+
+                const question =
+                    document.getElementById("question").value;
+
+                const optionA =
+                    document.getElementById("option_a").value;
+
+                const optionB =
+                    document.getElementById("option_b").value;
+
+                const optionC =
+                    document.getElementById("option_c").value;
+
+                const optionD =
+                    document.getElementById("option_d").value;
+
+                const correctOption =
+                    document.getElementById("correct_answer").value;
+
+
+                // Convert A/B/C/D to actual answer text
+                let correctAnswer = "";
+
+                if (correctOption === "A") {
+                    correctAnswer = optionA;
+                }
+
+                if (correctOption === "B") {
+                    correctAnswer = optionB;
+                }
+
+                if (correctOption === "C") {
+                    correctAnswer = optionC;
+                }
+
+                if (correctOption === "D") {
+                    correctAnswer = optionD;
+                }
+
+
+                fetch("http://localhost:3000/add-quiz", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        course_id: courseId,
+
+                        question: question,
+
+                        option_a: optionA,
+
+                        option_b: optionB,
+
+                        option_c: optionC,
+
+                        option_d: optionD,
+
+                        correct_answer: correctAnswer
+
+                    })
+
+                })
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        const message =
+                            document.getElementById("quiz-message");
+
+
+                        if (data.success) {
+
+                            message.innerText =
+                                "Quiz question added successfully!";
+
+                            document.getElementById("quizForm").reset();
+
+                        } else {
+
+                            message.innerText =
+                                data.message;
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        console.log(error);
+
+                        document.getElementById("quiz-message").innerText =
+                            "Unable to add quiz question.";
+
+                    });
+
+            });
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

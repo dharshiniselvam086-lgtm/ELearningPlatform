@@ -1,0 +1,458 @@
+/* ================================
+   GENERAL RESET
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef2ff, #f8faff);
+    color: #1f2937;
+}
+
+/* ================================
+   NAVBAR
+================================ */
+
+.navbar {
+    width: 100%;
+    padding: 18px 7%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(79, 70, 229, 0.25);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar h2 {
+    font-size: 24px;
+    letter-spacing: 0.5px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-left: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #facc15;
+}
+
+/* ================================
+   HEADINGS
+================================ */
+
+h1,
+h2,
+h3 {
+    color: #312e81;
+}
+
+.page-title {
+    text-align: center;
+    margin: 35px 0 25px;
+    font-size: 32px;
+}
+
+/* ================================
+   CONTAINER
+================================ */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+/* ================================
+   LOGIN AND REGISTER
+================================ */
+
+.login-container,
+.register-container {
+    width: 380px;
+    max-width: 90%;
+    margin: 80px auto;
+    padding: 35px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(79, 70, 229, 0.18);
+    text-align: center;
+}
+
+.login-container h2,
+.register-container h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 13px 15px;
+    margin: 10px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    transition: 0.3s;
+    background: #f9fafb;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    background: white;
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+button,
+.btn {
+    border: none;
+    padding: 12px 20px;
+    margin: 8px 4px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 12px rgba(79, 70, 229, 0.2);
+}
+
+button:hover,
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(79, 70, 229, 0.35);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+/* ================================
+   DASHBOARD
+================================ */
+
+.dashboard {
+    width: 90%;
+    max-width: 1200px;
+    margin: 35px auto;
+}
+
+.dashboard h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 28px 20px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(31, 41, 55, 0.08);
+    border-top: 5px solid #6366f1;
+    transition: 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.18);
+}
+
+.dashboard-card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.dashboard-card p {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+/* ================================
+   COURSE CARDS
+================================ */
+
+.course-list {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.course-card {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(31, 41, 55, 0.08);
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.course-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(135deg, #4f46e5, #a855f7);
+}
+
+.course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.2);
+}
+
+.course-card h3 {
+    margin: 12px 0;
+    font-size: 21px;
+}
+
+.course-card p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* ================================
+   FORM CARD
+================================ */
+
+.form-card {
+    width: 90%;
+    max-width: 600px;
+    margin: 35px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(31, 41, 55, 0.1);
+}
+
+.form-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ================================
+   QUIZ SECTION
+================================ */
+
+.quiz-box {
+    width: 90%;
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(31, 41, 55, 0.1);
+}
+
+.question-box {
+    margin-bottom: 25px;
+    padding: 20px;
+    border-left: 5px solid #6366f1;
+    background: #f5f3ff;
+    border-radius: 10px;
+}
+
+.question-box h3 {
+    margin-bottom: 15px;
+}
+
+.question-box label {
+    display: block;
+    padding: 10px;
+    margin: 8px 0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.question-box label:hover {
+    background: #e0e7ff;
+}
+
+/* ================================
+   TABLE
+================================ */
+
+table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(31, 41, 55, 0.08);
+}
+
+th {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tr:hover {
+    background: #f5f3ff;
+}
+
+/* ================================
+   MATERIALS AND ASSIGNMENTS
+================================ */
+
+.material-card,
+.assignment-card {
+    width: 90%;
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(31, 41, 55, 0.08);
+    transition: 0.3s;
+}
+
+.material-card:hover,
+.assignment-card:hover {
+    transform: translateY(-5px);
+}
+
+.material-card h3,
+.assignment-card h3 {
+    margin-bottom: 12px;
+}
+
+.material-card p,
+.assignment-card p {
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+/* ================================
+   RESULT PAGE
+================================ */
+
+.result-box {
+    width: 90%;
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 40px;
+    text-align: center;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(79, 70, 229, 0.15);
+}
+
+.result-box h1 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.result-box p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+/* ================================
+   MESSAGE
+================================ */
+
+.message {
+    width: 90%;
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #166534;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    text-align: center;
+    background: #312e81;
+    color: white;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .navbar a {
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .page-title {
+        font-size: 25px;
+    }
+
+    .login-container,
+    .register-container {
+        margin-top: 40px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}

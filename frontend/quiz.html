@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Java Programming Quiz</h1>
+
+        <p class="dashboard-text">
+            Answer all questions and submit the quiz.
+        </p>
+
+
+        <div class="quiz-box">
+
+            <form id="quizForm">
+
+                <div id="quiz-container">
+
+                    <p>Loading questions...</p>
+
+                </div>
+
+                <button type="submit">
+                    Submit Quiz
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Course ID
+        // Java Programming = Course ID 1
+        const courseId = 1;
+
+
+        // Store questions
+        let quizQuestions = [];
+
+
+        // Load questions from MySQL
+        fetch("http://localhost:3000/quizzes/" + courseId)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const container =
+                    document.getElementById("quiz-container");
+
+
+                if (!data.success || data.quizzes.length === 0) {
+
+                    container.innerHTML =
+                        "<p>No quiz questions available.</p>";
+
+                    return;
+
+                }
+
+
+                quizQuestions = data.quizzes;
+
+
+                container.innerHTML = "";
+
+
+                data.quizzes.forEach((quiz, index) => {
+
+                    const questionDiv =
+                        document.createElement("div");
+
+                    questionDiv.className = "question";
+
+
+                    questionDiv.innerHTML = `
+
+            <h3>
+                ${index + 1}. ${quiz.question}
+            </h3>
+
+            <label>
+                <input
+                    type="radio"
+                    name="question${quiz.quiz_id}"
+                    value="${quiz.option_a}"
+                >
+                ${quiz.option_a}
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="question${quiz.quiz_id}"
+                    value="${quiz.option_b}"
+                >
+                ${quiz.option_b}
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="question${quiz.quiz_id}"
+                    value="${quiz.option_c}"
+                >
+                ${quiz.option_c}
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="question${quiz.quiz_id}"
+                    value="${quiz.option_d}"
+                >
+                ${quiz.option_d}
+            </label>
+
+        `;
+
+
+                    container.appendChild(questionDiv);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("quiz-container").innerHTML =
+                    "<p>Unable to load quiz questions.</p>";
+
+            });
+
+
+        // Submit quiz
+        document.getElementById("quizForm")
+            .addEventListener("submit", function (event) {
+
+                event.preventDefault();
+
+
+                if (quizQuestions.length === 0) {
+
+                    alert("No quiz questions available.");
+
+                    return;
+
+                }
+
+
+                let score = 0;
+
+
+                // Check every question
+                for (let quiz of quizQuestions) {
+
+                    const selected =
+                        document.querySelector(
+                            'input[name="question' +
+                            quiz.quiz_id +
+                            '"]:checked'
+                        );
+
+
+                    if (!selected) {
+
+                        alert("Please answer all questions.");
+
+                        return;
+
+                    }
+
+
+                    if (selected.value === quiz.correct_answer) {
+
+                        score++;
+
+                    }
+
+                }
+
+
+                // Save result
+                fetch("http://localhost:3000/quiz-result", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        quiz_id: quizQuestions[0].quiz_id,
+
+                        student_id: user.user_id,
+
+                        score: score
+
+                    })
+
+                })
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        if (data.success) {
+
+                            localStorage.setItem(
+                                "quizScore",
+                                score
+                            );
+
+                            localStorage.setItem(
+                                "quizTotal",
+                                quizQuestions.length
+                            );
+
+
+                            alert(
+                                "Quiz submitted successfully!\n" +
+                                "Your Score: " +
+                                score +
+                                " / " +
+                                quizQuestions.length
+                            );
+
+
+                            window.location.href = "result.html";
+
+                        } else {
+
+                            alert(data.message);
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        console.log(error);
+
+                        alert("Unable to save quiz result.");
+
+                    });
+
+            });
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

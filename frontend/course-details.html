@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Course Details</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <div class="dashboard-card">
+
+            <h1 id="course-name">Loading...</h1>
+
+            <p id="course-description">
+                Loading course details...
+            </p>
+
+            <p>
+                <strong>Instructor:</strong>
+                <span id="instructor-name">Loading...</span>
+            </p>
+
+            <br>
+
+            <button onclick="enrollCourse()">
+                Enroll in Course
+            </button>
+
+            <p id="message"></p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Get selected course
+
+        const courseId =
+            localStorage.getItem("selectedCourseId");
+
+
+        if (!courseId) {
+
+            alert("No course selected.");
+
+            window.location.href = "courses.html";
+
+        }
+
+
+        // Load course details
+
+        fetch(
+            "http://localhost:3000/course/" + courseId
+        )
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (!data.success) {
+
+                    alert(data.message);
+
+                    window.location.href = "courses.html";
+
+                    return;
+
+                }
+
+
+                const course = data.course;
+
+
+                document.getElementById("course-name")
+                    .innerText = course.course_name;
+
+
+                document.getElementById("course-description")
+                    .innerText = course.description;
+
+
+                document.getElementById("instructor-name")
+                    .innerText = course.instructor_name;
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("course-name")
+                    .innerText = "Unable to load course";
+
+            });
+
+
+        // Enroll course
+
+        function enrollCourse() {
+
+            if (user.role !== "STUDENT") {
+
+                alert("Only students can enroll in courses.");
+
+                return;
+
+            }
+
+
+            fetch("http://localhost:3000/enroll", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    student_id: user.user_id,
+
+                    course_id: courseId
+
+                })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    const message =
+                        document.getElementById("message");
+
+
+                    if (data.success) {
+
+                        message.innerText =
+                            "Successfully enrolled in the course!";
+
+                        message.style.color = "green";
+
+                    } else {
+
+                        message.innerText =
+                            data.message;
+
+                        message.style.color = "red";
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.log(error);
+
+                    document.getElementById("message")
+                        .innerText =
+                        "Enrollment failed.";
+
+                });
+
+        }
+
+
+        // Logout
+
+        function logout() {
+
+            localStorage.removeItem("user");
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+
+
+</body>
+
+</html>

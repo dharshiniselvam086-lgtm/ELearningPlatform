@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Assignment</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="instructor-dashboard.html">Dashboard</a>
+            <a href="create-course.html">Create Course</a>
+            <a href="materials.html">Materials</a>
+            <a href="instructor-assignments.html">Assignments</a>
+            <a href="instructor-quiz.html">Quiz</a>
+            <a href="students.html">Students</a>
+            <a href="login.html">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Create Assignment</h1>
+
+        <p class="dashboard-text">
+            Create an assignment for your course.
+        </p>
+
+
+        <div class="form-card">
+
+            <form id="assignmentForm">
+
+                <label>Course ID</label>
+
+                <input type="number" id="course_id" placeholder="Enter course ID" required>
+
+
+                <label>Assignment Title</label>
+
+                <input type="text" id="title" placeholder="Enter assignment title" required>
+
+
+                <label>Assignment Description</label>
+
+                <textarea id="description" rows="6" placeholder="Enter assignment description" required></textarea>
+
+
+                <button type="submit">
+                    Create Assignment
+                </button>
+
+            </form>
+
+
+            <p id="assignment-message"></p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check instructor role
+        if (user.role !== "INSTRUCTOR") {
+
+            alert("Only instructors can create assignments.");
+
+            window.location.href = "student-dashboard.html";
+
+        }
+
+
+        // Create assignment
+        document.getElementById("assignmentForm")
+            .addEventListener("submit", function (event) {
+
+                event.preventDefault();
+
+
+                const courseId =
+                    document.getElementById("course_id").value;
+
+                const title =
+                    document.getElementById("title").value;
+
+                const description =
+                    document.getElementById("description").value;
+
+
+                fetch("http://localhost:3000/create-assignment", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        course_id: courseId,
+
+                        title: title,
+
+                        description: description
+
+                    })
+
+                })
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        const message =
+                            document.getElementById("assignment-message");
+
+
+                        if (data.success) {
+
+                            message.innerText =
+                                "Assignment created successfully!";
+
+                            document.getElementById("assignmentForm").reset();
+
+                        } else {
+
+                            message.innerText =
+                                data.message;
+
+                        }
+
+                    })
+
+                    .catch(error => {
+
+                        console.log(error);
+
+                        document.getElementById("assignment-message").innerText =
+                            "Unable to create assignment.";
+
+                    });
+
+            });
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

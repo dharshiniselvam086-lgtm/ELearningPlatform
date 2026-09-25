@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Assignments</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="materials-student.html">Materials</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Assignments</h1>
+
+        <p class="dashboard-text">
+            View and submit your course assignments.
+        </p>
+
+
+        <div id="assignments-container">
+
+            <p>Loading assignments...</p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check student role
+
+        if (user.role !== "STUDENT") {
+
+            alert("Only students can access assignments.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Load assignments
+
+        fetch("http://localhost:3000/assignments")
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const container =
+                    document.getElementById("assignments-container");
+
+
+                if (!data.success) {
+
+                    container.innerHTML =
+                        "<p>" + data.message + "</p>";
+
+                    return;
+
+                }
+
+
+                if (data.assignments.length === 0) {
+
+                    container.innerHTML =
+                        "<p>No assignments available.</p>";
+
+                    return;
+
+                }
+
+
+                container.innerHTML = "";
+
+
+                data.assignments.forEach(assignment => {
+
+                    const card =
+                        document.createElement("div");
+
+                    card.className =
+                        "dashboard-card";
+
+
+                    card.style.marginBottom = "20px";
+
+
+                    card.innerHTML = `
+
+            <h2>${assignment.title}</h2>
+
+            <p>
+                <strong>Course:</strong>
+                ${assignment.course_name}
+            </p>
+
+            <p>
+                ${assignment.description}
+            </p>
+
+            <br>
+
+            <label>
+                <strong>Your Answer:</strong>
+            </label>
+
+            <textarea
+                id="answer-${assignment.assignment_id}"
+                rows="6"
+                placeholder="Enter your assignment answer here..."
+                style="width:100%; margin-top:10px; padding:10px;">
+            </textarea>
+
+            <br>
+
+            <button
+                onclick="submitAssignment(${assignment.assignment_id})">
+                Submit Assignment
+            </button>
+
+            <p
+                id="message-${assignment.assignment_id}"
+                style="margin-top:10px;">
+            </p>
+
+        `;
+
+
+                    container.appendChild(card);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("assignments-container").innerHTML =
+                    "<p>Unable to load assignments.</p>";
+
+            });
+
+
+        // Submit assignment
+
+        function submitAssignment(assignmentId) {
+
+            const answer =
+                document.getElementById(
+                    "answer-" + assignmentId
+                ).value.trim();
+
+
+            if (answer === "") {
+
+                alert("Please enter your answer.");
+
+                return;
+
+            }
+
+
+            fetch("http://localhost:3000/submit-assignment", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    assignment_id: assignmentId,
+
+                    student_id: user.user_id,
+
+                    answer: answer
+
+                })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    const message =
+                        document.getElementById(
+                            "message-" + assignmentId
+                        );
+
+
+                    if (data.success) {
+
+                        message.innerText =
+                            "Assignment submitted successfully!";
+
+                        message.style.color = "green";
+
+
+                        document.getElementById(
+                            "answer-" + assignmentId
+                        ).disabled = true;
+
+                    } else {
+
+                        message.innerText =
+                            data.message;
+
+                        message.style.color = "red";
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.log(error);
+
+                    alert("Unable to submit assignment.");
+
+                });
+
+        }
+
+
+        // Logout
+
+        function logout() {
+
+            localStorage.removeItem("user");
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz Result</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Quiz Result</h1>
+
+        <div class="dashboard-card">
+
+            <h2>Java Programming Quiz</h2>
+
+            <p>Your Score:</p>
+
+            <h1 id="score">Loading...</h1>
+
+            <p id="message"></p>
+
+            <button onclick="tryAgain()">
+                Try Again
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Get latest result from MySQL
+        fetch("http://localhost:3000/quiz-result/" + user.user_id)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (data.success) {
+
+                    const score = data.result.score;
+
+                    const total =
+                        localStorage.getItem("quizTotal") || 1;
+
+
+                    document.getElementById("score").innerText =
+                        score + " / " + total;
+
+
+                    if (score >= Math.ceil(total / 2)) {
+
+                        document.getElementById("message").innerText =
+                            "Good job! You passed the quiz.";
+
+                    } else {
+
+                        document.getElementById("message").innerText =
+                            "You did not pass. Please try again.";
+
+                    }
+
+                }
+
+                else {
+
+                    document.getElementById("score").innerText =
+                        "No Result";
+
+                    document.getElementById("message").innerText =
+                        data.message;
+
+                }
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("score").innerText =
+                    "Error";
+
+                document.getElementById("message").innerText =
+                    "Unable to load quiz result.";
+
+            });
+
+
+        // Try Again
+        function tryAgain() {
+
+            window.location.href = "quiz.html";
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

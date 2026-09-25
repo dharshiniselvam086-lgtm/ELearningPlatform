@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Students</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="instructor-dashboard.html">Dashboard</a>
+            <a href="create-course.html">Create Course</a>
+            <a href="materials.html">Materials</a>
+            <a href="instructor-assignments.html">Assignments</a>
+            <a href="instructor-quiz.html">Quiz</a>
+            <a href="students.html">Students</a>
+            <a href="login.html">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Registered Students</h1>
+
+        <p class="dashboard-text">
+            View students registered on the E-Learning Platform.
+        </p>
+
+
+        <div class="dashboard-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="students-container">
+
+                    <tr>
+                        <td colspan="4">
+                            Loading students...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check instructor role
+        if (user.role !== "INSTRUCTOR") {
+
+            alert("Only instructors can view students.");
+
+            window.location.href = "student-dashboard.html";
+
+        }
+
+
+        // Get students from MySQL
+        fetch("http://localhost:3000/students")
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const container =
+                    document.getElementById("students-container");
+
+
+                if (!data.success) {
+
+                    container.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    ${data.message}
+                </td>
+            </tr>
+        `;
+
+                    return;
+
+                }
+
+
+                if (data.students.length === 0) {
+
+                    container.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    No students registered.
+                </td>
+            </tr>
+        `;
+
+                    return;
+
+                }
+
+
+                container.innerHTML = "";
+
+
+                data.students.forEach(student => {
+
+                    const row = document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+            <td>${student.user_id}</td>
+
+            <td>${student.name}</td>
+
+            <td>${student.email}</td>
+
+            <td>${student.role}</td>
+
+        `;
+
+
+                    container.appendChild(row);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("students-container").innerHTML = `
+        <tr>
+            <td colspan="4">
+                Unable to load students.
+            </td>
+        </tr>
+    `;
+
+            });
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

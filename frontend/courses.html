@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Available Courses</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Available Courses</h1>
+
+        <p class="dashboard-text">
+            Explore the courses available on the E-Learning Platform.
+        </p>
+
+
+        <div class="dashboard-cards" id="courses-container">
+
+            <p>Loading courses...</p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Load courses
+
+        fetch("http://localhost:3000/courses")
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const container =
+                    document.getElementById("courses-container");
+
+
+                if (!data.success) {
+
+                    container.innerHTML =
+                        "<p>" + data.message + "</p>";
+
+                    return;
+
+                }
+
+
+                if (data.courses.length === 0) {
+
+                    container.innerHTML =
+                        "<p>No courses available.</p>";
+
+                    return;
+
+                }
+
+
+                container.innerHTML = "";
+
+
+                data.courses.forEach(course => {
+
+                    const card =
+                        document.createElement("div");
+
+                    card.className = "dashboard-card";
+
+
+                    card.innerHTML = `
+
+            <h2>${course.course_name}</h2>
+
+            <p>
+                ${course.description}
+            </p>
+
+            <p>
+                <strong>Instructor:</strong>
+                ${course.instructor_name}
+            </p>
+
+            <button
+                onclick="viewCourse(${course.course_id})">
+                View Course
+            </button>
+
+        `;
+
+
+                    container.appendChild(card);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("courses-container").innerHTML =
+                    "<p>Unable to load courses.</p>";
+
+            });
+
+
+        // View course details
+
+        function viewCourse(courseId) {
+
+            localStorage.setItem(
+                "selectedCourseId",
+                courseId
+            );
+
+            window.location.href =
+                "course-details.html";
+
+        }
+
+
+        // Logout
+
+        function logout() {
+
+            localStorage.removeItem("user");
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

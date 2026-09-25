@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Course Materials</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="materials-student.html">Materials</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>Course Materials</h1>
+
+        <p class="dashboard-text">
+            View the learning materials for your course.
+        </p>
+
+
+        <div class="form-card">
+
+            <label for="course-id">
+                Enter Course ID
+            </label>
+
+            <input type="number" id="course-id" placeholder="Example: 1" required>
+
+            <button onclick="loadMaterials()">
+                View Materials
+            </button>
+
+        </div>
+
+
+        <br>
+
+
+        <div class="dashboard-cards" id="materials-container">
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check student role
+
+        if (user.role !== "STUDENT") {
+
+            alert("Only students can view course materials.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Load materials
+
+        function loadMaterials() {
+
+            const courseId =
+                document.getElementById("course-id").value;
+
+
+            if (!courseId) {
+
+                alert("Please enter a course ID.");
+
+                return;
+
+            }
+
+
+            const container =
+                document.getElementById("materials-container");
+
+
+            container.innerHTML =
+                "<p>Loading materials...</p>";
+
+
+            fetch(
+                "http://localhost:3000/materials/" + courseId
+            )
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    if (!data.success) {
+
+                        container.innerHTML =
+                            "<p>" + data.message + "</p>";
+
+                        return;
+
+                    }
+
+
+                    if (data.materials.length === 0) {
+
+                        container.innerHTML =
+                            "<p>No materials available for this course.</p>";
+
+                        return;
+
+                    }
+
+
+                    container.innerHTML = "";
+
+
+                    data.materials.forEach(material => {
+
+                        const card =
+                            document.createElement("div");
+
+                        card.className =
+                            "dashboard-card";
+
+
+                        card.innerHTML = `
+
+                <h2>${material.title}</h2>
+
+                <p>
+                    ${material.content}
+                </p>
+
+            `;
+
+
+                        container.appendChild(card);
+
+                    });
+
+                })
+
+                .catch(error => {
+
+                    console.log(error);
+
+                    container.innerHTML =
+                        "<p>Unable to load materials.</p>";
+
+                });
+
+        }
+
+
+        // Logout
+
+        function logout() {
+
+            localStorage.removeItem("user");
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

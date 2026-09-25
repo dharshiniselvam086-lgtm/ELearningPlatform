@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Courses</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="materials-student.html">Materials</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>My Courses</h1>
+
+        <p class="dashboard-text">
+            Courses you are currently enrolled in.
+        </p>
+
+
+        <div class="dashboard-cards" id="courses-container">
+
+            <p>Loading courses...</p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+
+        // Check login
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Check student role
+
+        if (user.role !== "STUDENT") {
+
+            alert("Only students can access this page.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // Load enrolled courses
+
+        fetch(
+            "http://localhost:3000/my-courses/" + user.user_id
+        )
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const container =
+                    document.getElementById("courses-container");
+
+
+                if (!data.success) {
+
+                    container.innerHTML =
+                        "<p>" + data.message + "</p>";
+
+                    return;
+
+                }
+
+
+                if (data.courses.length === 0) {
+
+                    container.innerHTML = `
+            <div class="dashboard-card">
+                <h2>No Courses</h2>
+                <p>You have not enrolled in any course yet.</p>
+
+                <button onclick="goToCourses()">
+                    Browse Courses
+                </button>
+            </div>
+        `;
+
+                    return;
+
+                }
+
+
+                container.innerHTML = "";
+
+
+                data.courses.forEach(course => {
+
+                    const card =
+                        document.createElement("div");
+
+                    card.className =
+                        "dashboard-card";
+
+
+                    card.innerHTML = `
+
+            <h2>${course.course_name}</h2>
+
+            <p>
+                ${course.description}
+            </p>
+
+            <p>
+                <strong>Instructor:</strong>
+                ${course.instructor_name}
+            </p>
+
+            <button
+                onclick="viewCourse(${course.course_id})">
+                View Course
+            </button>
+
+            <button
+                onclick="viewMaterials(${course.course_id})">
+                View Materials
+            </button>
+
+        `;
+
+
+                    container.appendChild(card);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.log(error);
+
+                document.getElementById("courses-container").innerHTML =
+                    "<p>Unable to load your courses.</p>";
+
+            });
+
+
+        // View course
+
+        function viewCourse(courseId) {
+
+            localStorage.setItem(
+                "selectedCourseId",
+                courseId
+            );
+
+            window.location.href =
+                "course-details.html";
+
+        }
+
+
+        // View materials
+
+        function viewMaterials(courseId) {
+
+            window.location.href =
+                "materials-student.html";
+
+        }
+
+
+        // Browse courses
+
+        function goToCourses() {
+
+            window.location.href =
+                "courses.html";
+
+        }
+
+
+        // Logout
+
+        function logout() {
+
+            localStorage.removeItem("user");
+
+        }
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

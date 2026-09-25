@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>E-Learning Platform - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="login-box">
+
+            <h1>E-Learning Platform</h1>
+            <p>Login to continue learning</p>
+
+            <form id="loginForm">
+
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+
+                <label>Role</label>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="STUDENT">Student</option>
+                    <option value="INSTRUCTOR">Instructor</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+
+                <button type="submit">Login</button>
+
+            </form>
+
+            <p id="message"></p>
+
+            <p class="register">
+                Don't have an account?
+                <a href="register.html">Register</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const role = document.getElementById("role").value;
+
+            try {
+
+                const response = await fetch("http://localhost:3000/login", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        role: role
+                    })
+
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    if (role === "STUDENT") {
+                        window.location.href = "student-dashboard.html";
+                    }
+                    else if (role === "INSTRUCTOR") {
+                        window.location.href = "instructor-dashboard.html";
+                    }
+                    else if (role === "ADMIN") {
+                        alert("Admin login successful!");
+                    }
+
+                }
+                else {
+
+                    document.getElementById("message").innerText =
+                        data.message;
+
+                }
+
+            }
+            catch (error) {
+
+                document.getElementById("message").innerText =
+                    "Unable to connect to server.";
+
+                console.log(error);
+
+            }
+
+        });
+
+    </script>
+    <script src="logout.js"></script>
+</body>
+
+</html>

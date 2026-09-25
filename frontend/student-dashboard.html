@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">E-Learning Platform</div>
+
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="courses.html">Courses</a>
+            <a href="my-courses.html">My Courses</a>
+            <a href="materials-student.html">Materials</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="result.html">Results</a>
+            <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+
+    </header>
+
+
+    <div class="dashboard">
+
+        <h1>
+            Welcome, <span id="student-name">Student</span>!
+        </h1>
+
+        <p class="dashboard-text">
+            Access your courses, assignments and quiz results.
+        </p>
+
+
+        <div class="dashboard-cards">
+
+
+            <!-- My Courses -->
+
+            <div class="dashboard-card">
+
+                <h2>My Courses</h2>
+
+                <p>
+                    Enrolled Courses:
+                    <strong id="course-count">Loading...</strong>
+                </p>
+
+                <button onclick="window.location.href='my-courses.html'">
+                    View Courses
+                </button>
+
+            </div>
+
+
+            <!-- Assignments -->
+
+            <div class="dashboard-card">
+
+                <h2>Assignments</h2>
+
+                <p>
+                    Available Assignments:
+                    <strong id="assignment-count">
+                        Loading...
+                    </strong>
+                </p>
+
+                <button onclick="window.location.href='assignments.html'">
+                    View Assignments
+                </button>
+
+            </div>
+
+
+            <!-- Quiz -->
+
+            <div class="dashboard-card">
+
+                <h2>Quiz</h2>
+
+                <p>
+                    Quiz Attempts:
+                    <strong id="quiz-count">
+                        Loading...
+                    </strong>
+                </p>
+
+                <button onclick="window.location.href='quiz.html'">
+                    Take Quiz
+                </button>
+
+            </div>
+
+
+            <!-- Results -->
+
+            <div class="dashboard-card">
+
+                <h2>Results</h2>
+
+                <p>
+                    View your latest quiz result.
+                </p>
+
+                <button onclick="window.location.href='result.html'">
+                    View Results
+                </button>
+
+            </div>
+
+
+            <!-- Available Courses -->
+
+            <div class="dashboard-card">
+
+                <h2>Available Courses</h2>
+
+                <p>
+                    Explore courses and enroll.
+                </p>
+
+                <button onclick="window.location.href='courses.html'">
+                    Browse Courses
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const user =
+            JSON.parse(localStorage.getItem("user"));
+
+
+        // ==============================
+        // CHECK LOGIN
+        // ==============================
+
+        if (!user) {
+
+            alert("Please login first.");
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // ==============================
+        // CHECK STUDENT ROLE
+        // ==============================
+
+        if (user.role !== "STUDENT") {
+
+            alert(
+                "Only students can access this dashboard."
+            );
+
+            window.location.href = "login.html";
+
+        }
+
+
+        // ==============================
+        // DISPLAY STUDENT NAME
+        // ==============================
+
+        document.getElementById("student-name").innerText =
+            user.name;
+
+
+        // ==============================
+        // GET DASHBOARD DATA
+        // ==============================
+
+        fetch(
+            "http://localhost:3000/student-dashboard/"
+            + user.user_id
+        )
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (!data.success) {
+
+                    alert(data.message);
+
+                    return;
+
+                }
+
+
+                const dashboard = data.dashboard;
+
+
+                // Enrolled Courses
+
+                document.getElementById("course-count").innerText =
+                    dashboard.enrolled_courses;
+
+
+                // Assignments
+
+                document.getElementById("assignment-count").innerText =
+                    dashboard.assignments;
+
+
+                // Quiz Attempts
+
+                document.getElementById("quiz-count").innerText =
+                    dashboard.quiz_attempts;
+
+            })
+
+
+            .catch(error => {
+
+                console.log(error);
+
+
+                document.getElementById("course-count").innerText =
+                    "Error";
+
+
+                document.getElementById("assignment-count").innerText =
+                    "Error";
+
+
+                document.getElementById("quiz-count").innerText =
+                    "Error";
+
+            });
+
+    </script>
+
+
+    <!-- Common Logout Function -->
+
+    <script src="logout.js"></script>
+
+
+</body>
+
+</html>
