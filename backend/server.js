@@ -8,39 +8,44 @@ app.use(cors());
 app.use(express.json());
 
 
-// ===============================
-// MYSQL DATABASE CONNECTION
-// ===============================
+// ==========================================
+// RAILWAY MYSQL DATABASE CONNECTION
+// ==========================================
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "1234",
-    database: "elearning_platform"
+    host: process.env.MYSQLHOST,
+    port: process.env.MYSQLPORT,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE
 });
 
 db.connect((err) => {
+
     if (err) {
         console.log("Database connection failed:", err);
         return;
     }
 
     console.log("MySQL Connected Successfully!");
+
 });
 
 
-// ===============================
+// ==========================================
 // TEST ROUTE
-// ===============================
+// ==========================================
 
 app.get("/", (req, res) => {
+
     res.send("E-Learning Backend is Running!");
+
 });
 
 
-// ===============================
+// ==========================================
 // LOGIN API
-// ===============================
+// ==========================================
 
 app.post("/login", (req, res) => {
 
@@ -54,19 +59,23 @@ app.post("/login", (req, res) => {
     db.query(sql, [email, password, role], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Database error"
             });
+
         }
 
         if (results.length === 0) {
+
             return res.json({
                 success: false,
                 message: "Invalid email, password or role"
             });
+
         }
 
         res.json({
@@ -80,9 +89,9 @@ app.post("/login", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // REGISTER API
-// ===============================
+// ==========================================
 
 app.post("/register", (req, res) => {
 
@@ -98,10 +107,12 @@ app.post("/register", (req, res) => {
         if (err) {
 
             if (err.code === "ER_DUP_ENTRY") {
+
                 return res.json({
                     success: false,
                     message: "Email already registered"
                 });
+
             }
 
             console.log(err);
@@ -110,6 +121,7 @@ app.post("/register", (req, res) => {
                 success: false,
                 message: "Database error"
             });
+
         }
 
         res.json({
@@ -122,9 +134,9 @@ app.post("/register", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // ENROLL COURSE API
-// ===============================
+// ==========================================
 
 app.post("/enroll", (req, res) => {
 
@@ -143,19 +155,23 @@ app.post("/enroll", (req, res) => {
         (err, results) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Database error"
                 });
+
             }
 
             if (results.length > 0) {
+
                 return res.json({
                     success: false,
                     message: "You are already enrolled in this course."
                 });
+
             }
 
             const insertSql = `
@@ -170,12 +186,14 @@ app.post("/enroll", (req, res) => {
                 (err, result) => {
 
                     if (err) {
+
                         console.log(err);
 
                         return res.status(500).json({
                             success: false,
                             message: "Enrollment failed"
                         });
+
                     }
 
                     res.json({
@@ -192,9 +210,9 @@ app.post("/enroll", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET STUDENT COURSES
-// ===============================
+// ==========================================
 
 app.get("/my-courses/:student_id", (req, res) => {
 
@@ -217,12 +235,14 @@ app.get("/my-courses/:student_id", (req, res) => {
     db.query(sql, [studentId], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Database error"
             });
+
         }
 
         res.json({
@@ -235,9 +255,9 @@ app.get("/my-courses/:student_id", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET ASSIGNMENTS
-// ===============================
+// ==========================================
 
 app.get("/assignments", (req, res) => {
 
@@ -255,12 +275,14 @@ app.get("/assignments", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Database error"
             });
+
         }
 
         res.json({
@@ -273,9 +295,9 @@ app.get("/assignments", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // SUBMIT ASSIGNMENT
-// ===============================
+// ==========================================
 
 app.post("/submit-assignment", (req, res) => {
 
@@ -293,12 +315,14 @@ app.post("/submit-assignment", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Submission failed"
                 });
+
             }
 
             res.json({
@@ -312,9 +336,9 @@ app.post("/submit-assignment", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // SAVE QUIZ RESULT
-// ===============================
+// ==========================================
 
 app.post("/quiz-result", (req, res) => {
 
@@ -332,12 +356,14 @@ app.post("/quiz-result", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Quiz result saving failed"
                 });
+
             }
 
             res.json({
@@ -351,9 +377,9 @@ app.post("/quiz-result", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET STUDENT QUIZ RESULT
-// ===============================
+// ==========================================
 
 app.get("/quiz-result/:student_id", (req, res) => {
 
@@ -375,19 +401,23 @@ app.get("/quiz-result/:student_id", (req, res) => {
     db.query(sql, [studentId], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Database error"
             });
+
         }
 
         if (results.length === 0) {
+
             return res.json({
                 success: false,
                 message: "No quiz result found"
             });
+
         }
 
         res.json({
@@ -400,13 +430,17 @@ app.get("/quiz-result/:student_id", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // CREATE COURSE
-// ===============================
+// ==========================================
 
 app.post("/create-course", (req, res) => {
 
-    const { course_name, description, instructor_id } = req.body;
+    const {
+        course_name,
+        description,
+        instructor_id
+    } = req.body;
 
     const sql = `
         INSERT INTO courses
@@ -420,12 +454,14 @@ app.post("/create-course", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Course creation failed"
                 });
+
             }
 
             res.json({
@@ -439,13 +475,17 @@ app.post("/create-course", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // ADD COURSE MATERIAL
-// ===============================
+// ==========================================
 
 app.post("/add-material", (req, res) => {
 
-    const { course_id, title, content } = req.body;
+    const {
+        course_id,
+        title,
+        content
+    } = req.body;
 
     const sql = `
         INSERT INTO materials
@@ -459,12 +499,14 @@ app.post("/add-material", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Material adding failed"
                 });
+
             }
 
             res.json({
@@ -478,13 +520,17 @@ app.post("/add-material", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // CREATE ASSIGNMENT
-// ===============================
+// ==========================================
 
 app.post("/create-assignment", (req, res) => {
 
-    const { course_id, title, description } = req.body;
+    const {
+        course_id,
+        title,
+        description
+    } = req.body;
 
     const sql = `
         INSERT INTO assignments
@@ -498,12 +544,14 @@ app.post("/create-assignment", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Assignment creation failed"
                 });
+
             }
 
             res.json({
@@ -517,9 +565,9 @@ app.post("/create-assignment", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // ADD QUIZ QUESTION
-// ===============================
+// ==========================================
 
 app.post("/add-quiz", (req, res) => {
 
@@ -535,7 +583,15 @@ app.post("/add-quiz", (req, res) => {
 
     const sql = `
         INSERT INTO quizzes
-        (course_id, question, option_a, option_b, option_c, option_d, correct_answer)
+        (
+            course_id,
+            question,
+            option_a,
+            option_b,
+            option_c,
+            option_d,
+            correct_answer
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -553,12 +609,14 @@ app.post("/add-quiz", (req, res) => {
         (err, result) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Quiz question adding failed"
                 });
+
             }
 
             res.json({
@@ -572,9 +630,9 @@ app.post("/add-quiz", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET QUIZ QUESTIONS
-// ===============================
+// ==========================================
 
 app.get("/quizzes/:course_id", (req, res) => {
 
@@ -596,12 +654,14 @@ app.get("/quizzes/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Unable to load quiz questions"
             });
+
         }
 
         res.json({
@@ -614,9 +674,9 @@ app.get("/quizzes/:course_id", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET STUDENTS
-// ===============================
+// ==========================================
 
 app.get("/students", (req, res) => {
 
@@ -633,12 +693,14 @@ app.get("/students", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Unable to load students"
             });
+
         }
 
         res.json({
@@ -651,9 +713,9 @@ app.get("/students", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // STUDENT DASHBOARD
-// ===============================
+// ==========================================
 
 app.get("/student-dashboard/:student_id", (req, res) => {
 
@@ -661,16 +723,22 @@ app.get("/student-dashboard/:student_id", (req, res) => {
 
     const sql = `
         SELECT
-            (SELECT COUNT(*)
-             FROM enrollments
-             WHERE student_id = ?) AS enrolled_courses,
+            (
+                SELECT COUNT(*)
+                FROM enrollments
+                WHERE student_id = ?
+            ) AS enrolled_courses,
 
-            (SELECT COUNT(*)
-             FROM assignments) AS assignments,
+            (
+                SELECT COUNT(*)
+                FROM assignments
+            ) AS assignments,
 
-            (SELECT COUNT(*)
-             FROM quiz_results
-             WHERE student_id = ?) AS quiz_attempts
+            (
+                SELECT COUNT(*)
+                FROM quiz_results
+                WHERE student_id = ?
+            ) AS quiz_attempts
     `;
 
     db.query(
@@ -679,12 +747,14 @@ app.get("/student-dashboard/:student_id", (req, res) => {
         (err, results) => {
 
             if (err) {
+
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Unable to load dashboard"
                 });
+
             }
 
             res.json({
@@ -698,9 +768,9 @@ app.get("/student-dashboard/:student_id", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET ALL COURSES
-// ===============================
+// ==========================================
 
 app.get("/courses", (req, res) => {
 
@@ -718,12 +788,14 @@ app.get("/courses", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Unable to load courses"
             });
+
         }
 
         res.json({
@@ -736,9 +808,9 @@ app.get("/courses", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET COURSE DETAILS
-// ===============================
+// ==========================================
 
 app.get("/course/:course_id", (req, res) => {
 
@@ -759,19 +831,23 @@ app.get("/course/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Unable to load course details"
             });
+
         }
 
         if (results.length === 0) {
+
             return res.json({
                 success: false,
                 message: "Course not found"
             });
+
         }
 
         res.json({
@@ -784,9 +860,9 @@ app.get("/course/:course_id", (req, res) => {
 });
 
 
-// ===============================
+// ==========================================
 // GET COURSE MATERIALS
-// ===============================
+// ==========================================
 
 app.get("/materials/:course_id", (req, res) => {
 
@@ -805,12 +881,14 @@ app.get("/materials/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
+
             console.log(err);
 
             return res.status(500).json({
                 success: false,
                 message: "Unable to load course materials"
             });
+
         }
 
         res.json({
@@ -823,12 +901,14 @@ app.get("/materials/:course_id", (req, res) => {
 });
 
 
-// ===============================
-// RAILWAY PORT
-// ===============================
+// ==========================================
+// START SERVER - RAILWAY
+// ==========================================
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
+
     console.log(`Server running on port ${PORT}`);
+
 });
