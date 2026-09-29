@@ -7,6 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// ===============================
+// MYSQL DATABASE CONNECTION
+// ===============================
+
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -23,12 +28,20 @@ db.connect((err) => {
     console.log("MySQL Connected Successfully!");
 });
 
-// Test route
+
+// ===============================
+// TEST ROUTE
+// ===============================
+
 app.get("/", (req, res) => {
     res.send("E-Learning Backend is Running!");
 });
 
-// Login API
+
+// ===============================
+// LOGIN API
+// ===============================
+
 app.post("/login", (req, res) => {
 
     const { email, password, role } = req.body;
@@ -42,6 +55,7 @@ app.post("/login", (req, res) => {
 
         if (err) {
             console.log(err);
+
             return res.status(500).json({
                 success: false,
                 message: "Database error"
@@ -60,8 +74,16 @@ app.post("/login", (req, res) => {
             message: "Login successful",
             user: results[0]
         });
+
     });
-});// Register API
+
+});
+
+
+// ===============================
+// REGISTER API
+// ===============================
+
 app.post("/register", (req, res) => {
 
     const { name, email, password, role } = req.body;
@@ -94,17 +116,19 @@ app.post("/register", (req, res) => {
             success: true,
             message: "Registration successful!"
         });
+
     });
 
 });
-// Enroll Course API
-// Enroll Course
+
+
+// ===============================
+// ENROLL COURSE API
+// ===============================
+
 app.post("/enroll", (req, res) => {
 
     const { student_id, course_id } = req.body;
-
-
-    // Check whether already enrolled
 
     const checkSql = `
         SELECT *
@@ -113,37 +137,26 @@ app.post("/enroll", (req, res) => {
         AND course_id = ?
     `;
 
-
     db.query(
         checkSql,
         [student_id, course_id],
         (err, results) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
                     success: false,
                     message: "Database error"
                 });
-
             }
 
-
-            // Already enrolled
-
             if (results.length > 0) {
-
                 return res.json({
                     success: false,
                     message: "You are already enrolled in this course."
                 });
-
             }
-
-
-            // New enrollment
 
             const insertSql = `
                 INSERT INTO enrollments
@@ -151,23 +164,19 @@ app.post("/enroll", (req, res) => {
                 VALUES (?, ?)
             `;
 
-
             db.query(
                 insertSql,
                 [student_id, course_id],
                 (err, result) => {
 
                     if (err) {
-
                         console.log(err);
 
                         return res.status(500).json({
                             success: false,
                             message: "Enrollment failed"
                         });
-
                     }
-
 
                     res.json({
                         success: true,
@@ -181,7 +190,12 @@ app.post("/enroll", (req, res) => {
     );
 
 });
-// Get Student Courses API
+
+
+// ===============================
+// GET STUDENT COURSES
+// ===============================
+
 app.get("/my-courses/:student_id", (req, res) => {
 
     const studentId = req.params.student_id;
@@ -203,7 +217,6 @@ app.get("/my-courses/:student_id", (req, res) => {
     db.query(sql, [studentId], (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -221,7 +234,11 @@ app.get("/my-courses/:student_id", (req, res) => {
 
 });
 
-// Get Assignments API
+
+// ===============================
+// GET ASSIGNMENTS
+// ===============================
+
 app.get("/assignments", (req, res) => {
 
     const sql = `
@@ -238,7 +255,6 @@ app.get("/assignments", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -254,7 +270,13 @@ app.get("/assignments", (req, res) => {
 
     });
 
-});// Submit Assignment API
+});
+
+
+// ===============================
+// SUBMIT ASSIGNMENT
+// ===============================
+
 app.post("/submit-assignment", (req, res) => {
 
     const { assignment_id, student_id, answer } = req.body;
@@ -271,7 +293,6 @@ app.post("/submit-assignment", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -289,7 +310,12 @@ app.post("/submit-assignment", (req, res) => {
     );
 
 });
-// Save Quiz Result API
+
+
+// ===============================
+// SAVE QUIZ RESULT
+// ===============================
+
 app.post("/quiz-result", (req, res) => {
 
     const { quiz_id, student_id, score } = req.body;
@@ -306,7 +332,6 @@ app.post("/quiz-result", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -324,7 +349,12 @@ app.post("/quiz-result", (req, res) => {
     );
 
 });
-// Get Student Quiz Result API
+
+
+// ===============================
+// GET STUDENT QUIZ RESULT
+// ===============================
+
 app.get("/quiz-result/:student_id", (req, res) => {
 
     const studentId = req.params.student_id;
@@ -345,7 +375,6 @@ app.get("/quiz-result/:student_id", (req, res) => {
     db.query(sql, [studentId], (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -355,7 +384,6 @@ app.get("/quiz-result/:student_id", (req, res) => {
         }
 
         if (results.length === 0) {
-
             return res.json({
                 success: false,
                 message: "No quiz result found"
@@ -370,7 +398,12 @@ app.get("/quiz-result/:student_id", (req, res) => {
     });
 
 });
-// Create Course API
+
+
+// ===============================
+// CREATE COURSE
+// ===============================
+
 app.post("/create-course", (req, res) => {
 
     const { course_name, description, instructor_id } = req.body;
@@ -387,7 +420,6 @@ app.post("/create-course", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -405,7 +437,12 @@ app.post("/create-course", (req, res) => {
     );
 
 });
-// Add Course Material API
+
+
+// ===============================
+// ADD COURSE MATERIAL
+// ===============================
+
 app.post("/add-material", (req, res) => {
 
     const { course_id, title, content } = req.body;
@@ -422,7 +459,6 @@ app.post("/add-material", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -440,7 +476,12 @@ app.post("/add-material", (req, res) => {
     );
 
 });
-// Create Assignment API
+
+
+// ===============================
+// CREATE ASSIGNMENT
+// ===============================
+
 app.post("/create-assignment", (req, res) => {
 
     const { course_id, title, description } = req.body;
@@ -457,7 +498,6 @@ app.post("/create-assignment", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -475,7 +515,12 @@ app.post("/create-assignment", (req, res) => {
     );
 
 });
-// Add Quiz Question API
+
+
+// ===============================
+// ADD QUIZ QUESTION
+// ===============================
+
 app.post("/add-quiz", (req, res) => {
 
     const {
@@ -508,7 +553,6 @@ app.post("/add-quiz", (req, res) => {
         (err, result) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -526,7 +570,12 @@ app.post("/add-quiz", (req, res) => {
     );
 
 });
-// Get Quiz Questions API
+
+
+// ===============================
+// GET QUIZ QUESTIONS
+// ===============================
+
 app.get("/quizzes/:course_id", (req, res) => {
 
     const courseId = req.params.course_id;
@@ -547,7 +596,6 @@ app.get("/quizzes/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -564,7 +612,12 @@ app.get("/quizzes/:course_id", (req, res) => {
     });
 
 });
-// Get Students API
+
+
+// ===============================
+// GET STUDENTS
+// ===============================
+
 app.get("/students", (req, res) => {
 
     const sql = `
@@ -580,7 +633,6 @@ app.get("/students", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -597,7 +649,12 @@ app.get("/students", (req, res) => {
     });
 
 });
-// Student Dashboard
+
+
+// ===============================
+// STUDENT DASHBOARD
+// ===============================
+
 app.get("/student-dashboard/:student_id", (req, res) => {
 
     const studentId = req.params.student_id;
@@ -622,7 +679,6 @@ app.get("/student-dashboard/:student_id", (req, res) => {
         (err, results) => {
 
             if (err) {
-
                 console.log(err);
 
                 return res.status(500).json({
@@ -640,7 +696,12 @@ app.get("/student-dashboard/:student_id", (req, res) => {
     );
 
 });
-// Get All Courses
+
+
+// ===============================
+// GET ALL COURSES
+// ===============================
+
 app.get("/courses", (req, res) => {
 
     const sql = `
@@ -657,7 +718,6 @@ app.get("/courses", (req, res) => {
     db.query(sql, (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -674,7 +734,12 @@ app.get("/courses", (req, res) => {
     });
 
 });
-// Get Course Details
+
+
+// ===============================
+// GET COURSE DETAILS
+// ===============================
+
 app.get("/course/:course_id", (req, res) => {
 
     const courseId = req.params.course_id;
@@ -694,7 +759,6 @@ app.get("/course/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -704,7 +768,6 @@ app.get("/course/:course_id", (req, res) => {
         }
 
         if (results.length === 0) {
-
             return res.json({
                 success: false,
                 message: "Course not found"
@@ -719,7 +782,12 @@ app.get("/course/:course_id", (req, res) => {
     });
 
 });
-// Get Course Materials
+
+
+// ===============================
+// GET COURSE MATERIALS
+// ===============================
+
 app.get("/materials/:course_id", (req, res) => {
 
     const courseId = req.params.course_id;
@@ -737,7 +805,6 @@ app.get("/materials/:course_id", (req, res) => {
     db.query(sql, [courseId], (err, results) => {
 
         if (err) {
-
             console.log(err);
 
             return res.status(500).json({
@@ -755,6 +822,13 @@ app.get("/materials/:course_id", (req, res) => {
 
 });
 
-app.listen(3000, () => {
-    console.log("Server running at http://localhost:3000");
+
+// ===============================
+// RAILWAY PORT
+// ===============================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
