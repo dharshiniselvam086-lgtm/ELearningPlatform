@@ -84,7 +84,7 @@
 
 
         // Load questions from MySQL
-        fetch("http://localhost:3000/quizzes/" + courseId)
+        fetch("https://elearningplatform-production-59e9.up.railway.app/quizzes/" + courseId)
 
             .then(response => response.json())
 
@@ -228,7 +228,7 @@
 
 
                 // Save result
-                fetch("http://localhost:3000/quiz-result", {
+                fetch("https://elearningplatform-production-59e9.up.railway.app/quiz-result", {
 
                     method: "POST",
 

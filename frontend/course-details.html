@@ -91,7 +91,7 @@
         // Load course details
 
         fetch(
-            "http://localhost:3000/course/" + courseId
+            "https://elearningplatform-production-59e9.up.railway.app/course/" + courseId
         )
 
             .then(response => response.json())
@@ -148,7 +148,7 @@
             }
 
 
-            fetch("http://localhost:3000/enroll", {
+            fetch("https://elearningplatform-production-59e9.up.railway.app/enroll", {
 
                 method: "POST",
 
